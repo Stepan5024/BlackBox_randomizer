@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static java.lang.System.*;
 
@@ -19,9 +20,9 @@ public class Main extends JFrame {
 
     public static double ALLOWANCE = (double) 0.05;
     public static int WRITEOFFBOBER = 20;//списание 20 % бобров
-    public static int I = 30;
-    public static int J = 30;
-    public static int K = 40;
+    public static int I = 20;
+    public static int J = 20;
+    public static int K = 20;
 
     int price1BlackBox = 0;
     int priceLoots1 = 0;
@@ -328,7 +329,7 @@ public class Main extends JFrame {
                         "Заполните данные",
                         JOptionPane.WARNING_MESSAGE);
             } else {
-                try {
+              //  try {
 
 
                     if (cbBobrs.isSelected() && cbLoyalnost.isSelected()) {
@@ -365,7 +366,7 @@ public class Main extends JFrame {
                                 "Выберите тип",
                                 JOptionPane.WARNING_MESSAGE);
                     }
-                } catch (Exception ex) {
+               /* } catch (Exception ex) {
                     System.out.println(ex + " Главное искл в чек боксах");
                     JOptionPane.showMessageDialog(Main.this,
                             new String[]{"Значения следует ввести как числа",
@@ -373,7 +374,7 @@ public class Main extends JFrame {
                                     " Бюджета"},
                             "Корректные данные введите",
                             JOptionPane.WARNING_MESSAGE);
-                }
+                }*/
             }
 
         });
@@ -399,29 +400,23 @@ public class Main extends JFrame {
         System.out.println(Main.getTruetness(costs));*/
     }
 
-    public static double getTruetness(double[] costs) {
-        int price1 = (int) costs[0];
-        int price2 = (int) costs[1];
-        int price3 = (int) costs[2];
-        int costLot = (int) costs[3];
-        int kol1 = (int) costs[4];
-        int kol2 = (int) costs[5];
-        int kol3 = (int) costs[6];
+    public static double getTruetness(int[] costs, int[] indexs) {
+        double costLot =  costs[7]; // стоимость лота
+        double[] coefficients = new double[6]; // массив коэффицентов разности валюты выигрыша к стоимости BlackBox
+        for (int i = 0; i < coefficients.length; i++) {
+            coefficients[i] = (costs[i] - costLot) / costLot;
+        }
 
-        double deltanormal = price2 - costLot;
-        double normalKoeff = deltanormal / costLot;
+        int[] unhappy = new int[6]; // массив кол-ва недовльных в среднем выигрышем
+        for (int i = 0; i < unhappy.length; i++) {
+            unhappy[i] = (int) coefficients[i] * indexs[i];
+        }
 
-        double deltaunhappy = price3 - costLot;
-        double unhappyKoeff = deltaunhappy / costLot;
+        double joyful = Arrays.stream(indexs).sum(); // посчитаем сумму довольных,
+        joyful += Arrays.stream(unhappy).asDoubleStream().sum();// вычитая из общей массы участников массива недовольных
+        double loyalty = joyful / Arrays.stream(indexs).sum(); // отношение довольных к общей массе участников
 
-        int peopleNedavolnNormal = (int) (normalKoeff * kol2);
-        int peopleNedavolnUnhappy = (int) (unhappyKoeff * kol3);
-
-        double Dovolnye = kol1 + kol2 + kol3 + peopleNedavolnNormal + peopleNedavolnUnhappy;
-
-        double loyality = Dovolnye / (kol1 + kol2 + kol3);
-
-        return loyality * 100;
+        return loyalty * 100;
 
     }
 
@@ -438,21 +433,17 @@ public class Main extends JFrame {
         int discount30 = 1500; // скидка в 30 % в рублях ср. знач
         int discount40 = 2000; // скидка в 40 % в рублях ср. знач
 
+        int discount10Bobr =  discount10 / 2;
+        int discount20Bobr =  discount20 / 2;
+        int discount30Bobr =  discount30 / 2;
+        int discount40Bobr =  discount40 / 2;
+
         double BudgetAllowance = costBudget + costBudget * ALLOWANCE; // превысить бюджет на 5%
         double BudgetAllowanceDown = costBudget - costBudget * ALLOWANCE; // закупиться меньше бюджета на 5%
         out.println("BudgetAllowance = " + BudgetAllowance);
         out.println("BudgetAllowanceDown  = " + BudgetAllowanceDown);
 
-        ArrayList<double[]> maxLoyality = new ArrayList<>();
 
-        for (int i = 0; i < 6; i++) {
-            double[] temp = new double[11]; // индексы 0,1,2,3,4,5,6 это товары и скидки значение цены в руб/бобр
-            temp[7] = -1000000;// абсолютный минимум лояльности
-            temp[8] = -1000000;// минимум выгоды компании
-            temp[9] = 0; // минимум вероятности
-
-            maxLoyality.add(temp);
-        }
 
 
         int cost1Bobr = (int) (cost1 / 2);
@@ -461,10 +452,7 @@ public class Main extends JFrame {
         if (cost3Bobr < 0.15 * cost2) {
             cost3Bobr = (int) (0.15 * cost2);
         }
-        int discount10Bobr =  discount10 / 2;
-        int discount20Bobr =  discount20 / 2;
-        int discount30Bobr =  discount30 / 2;
-        int discount40Bobr =  discount40 / 2;
+
 
         if (priceBLot1.getText().compareTo(priceBfor1count) != 0) {
             try {
@@ -531,98 +519,139 @@ public class Main extends JFrame {
         priceLoots2 = cost2Bobr;
         priceLoots3 = cost3Bobr;
        // out.println("Цена бокса " + pricePer1BoxBobr + " стоимость лота 1 " + cost1Bobr+ " стоимость лота 2 " + cost2Bobr + " стоимость лота 3 " + cost3Bobr );
+        int[] pricesRub = new int[7];
+        pricesRub[0] = (int) cost1;
+        pricesRub[1] = (int) cost2;
+        pricesRub[2] = (int) cost3;
+        pricesRub[3] =  discount10;
+        pricesRub[4] =  discount20;
+        pricesRub[5] =  discount30;
+        pricesRub[6] =  discount40;
 
-        for (int i = 1; i < I; i++) {
-            for (int j = 1; j < J; j++) {
-                for (int k = 1; k < K; k++) {
-                    double totalRub= (double) (i * cost1 + j * cost2 + k * cost3);
-                    double totalBobr= (double) (i * cost1Bobr + j * cost2Bobr + k * cost3Bobr);
-                    zatracheno = (int) (cost1 * i + cost2 * j + cost3 * k);
-                    int receivedOnUsersBobr = pricePer1BoxBobr * (i + j + k) * 2;
-                    double BenefitsForCompanyBobr = receivedOnUsersBobr - totalRub;
-                    double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / receivedOnUsersBobr);
-                    //BenefitsForCompanyPerProcentBobr = new BigDecimal(BenefitsForCompanyPerProcentBobr).setScale(2, RoundingMode.UP).doubleValue();
-                    double veroyatnost = (double) i / (double) (i + j + k);
+        int[] pricesBobr = new int[7];
+        pricesBobr[0] = (int) cost1Bobr;
+        pricesBobr[1] = (int) cost2Bobr;
+        pricesBobr[2] = (int) cost3Bobr;
+        pricesBobr[3] =  discount10Bobr;
+        pricesBobr[4] =  discount20Bobr;
+        pricesBobr[5] =  discount30Bobr;
+        pricesBobr[6] =  discount40Bobr;
 
-                    //System.out.println("totalBobr - costBudgetBobr) >= 0 " + totalBobr + " "+ costBudgetBobr);
-                    double[] ew = new double[7];
-                    ew[0] = cost1Bobr;
-                    ew[1] = cost2Bobr;
-                    ew[2] = cost3Bobr;
-                    ew[3] = pricePer1BoxBobr;
-                    ew[4] = i;
-                    ew[5] = j;
-                    ew[6] = k;
-                    double trueness = getTruetness(ew);
-                    int delta = (int) Math.abs(totalRub - Math.abs(costBudget));
-                    double procent = (delta / costBudget);
-                    //System.out.println(procent);
-                    boolean b1 = (totalBobr * 2) < BudgetAllowance;
-                    boolean b2 = ((totalBobr * 2) >= costBudget);
-                    boolean b3 = (BenefitsForCompanyPerProcentBobr > -2 && BenefitsForCompanyPerProcentBobr < 80);
-                    boolean b4 = (Math.abs(procent) < 0.05);
-                    //System.out.println("b1 " + b1 + " b2 " + b2  + " b3 " + b3 + " b4 " + b4 + " " + procent);
-                    if (((totalRub  ) > BudgetAllowanceDown && (totalRub ) < BudgetAllowance)  && (BenefitsForCompanyPerProcentBobr > 0 && BenefitsForCompanyPerProcentBobr < 10 && Math.abs(procent) < 0.05 )) {
-                       // out.println(procent  + " procent " + " total bobr in rub = "+ totalRub);
-                        //System.out.println("Я здесь");
-                        //System.out.println("b1 " + b1 + " b2 " + b2  + " b3 " + b3 + " b4 " + b4 + " " + procent);
-                        double[] temp = maxLoyality.get(5);
-                        double[] temp1 = maxLoyality.get(4);
-                        double[] temp2 = maxLoyality.get(3);
+        ArrayList<double[]> maxLoyality = new ArrayList<>();
+
+        for (int i = 0; i < 6; i++) {
+            double[] temp = new double[11]; // индексы 0,1,2,3,4,5,6 это товары и скидки значение цены в руб/бобр
+            temp[7] = -1000000;// абсолютный минимум лояльности
+            temp[8] = -1000000;// минимум выгоды компании
+            temp[9] = 0; // минимум вероятности
+            maxLoyality.add(temp);
+        }
+        int[] costing = new int[8]; // массив цен в бобрах
+        costing[0] = cost1Bobr;
+        costing[1] = cost2Bobr;
+        costing[2] = cost3Bobr;
+        costing[3] = discount10Bobr;
+        costing[4] = discount20Bobr;
+        costing[5] = discount30Bobr;
+        costing[6] = discount40Bobr;
+        costing[7] = pricePer1BoxBobr;
+
+        for (int i = 7; i < I; i++) {
+            for (int j = 7; j < J; j++) {
+                for (int k = 7; k < K; k++) {
+                    for (int l = 0; l < 10; l++) {
+                        for (int m = 0; m < 9; m++) {
+                            for (int n = 0; n < 8; n++) {
+                                for (int p = 0; p < 6; p++) {
+                                    int[] index = new int[7];
+                                    index[0] = i; // Лот 1
+                                    index[1] = j; // Лот 2
+                                    index[2] = k; // Лот 3
+                                    index[3] = l; // Скидка 10
+                                    index[4] = m; // Скидка 20
+                                    index[5] = n; // Скидка 30
+                                    index[6] = p; // Скидка 40
+
+                                    double totalRub= GetRealCost(index, pricesRub);
+                                   //double totalBobr= GetRealCost(index, pricesRub);
+                                    zatracheno = GetRealCost(index, pricesRub);
+                                    int receivedOnUsersBobr = ReceivedOnUsers(index, pricePer1BoxBobr) * 2; // получили заработок магазина в бобрах
+                                    double BenefitsForCompanyBobr = receivedOnUsersBobr - totalRub;
+                                    double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / receivedOnUsersBobr);
+                                    //BenefitsForCompanyPerProcentBobr = new BigDecimal(BenefitsForCompanyPerProcentBobr).setScale(2, RoundingMode.UP).doubleValue();
+                                    double probability = GetProbability(i, index); // вероятность выпадения первого лота самого дорогого
 
 
-                        if ((temp[3] <= trueness )) {
-                            for (int l = 0; l < temp.length; l++)
-                                temp2[l] = temp1[l];
-                            for (int l = 0; l < temp.length; l++)
-                                temp1[l] = temp[l];
 
-                            temp[0] = i;
-                            temp[1] = j;
-                            temp[2] = k;
-                            temp[3] = trueness;
-                            temp[4] = BenefitsForCompanyPerProcentBobr;
-                            temp[5] = veroyatnost;
-                            temp[6] = zatracheno;
+                                    double trueness = getTruetness(costing, index);
+                                    int delta = (int) Math.abs(totalRub - Math.abs(costBudget));
+                                    double procent = (delta / costBudget);
+                                    System.out.println(procent);
 
-                            maxLoyality.set(3, temp2);
-                            maxLoyality.set(4, temp1);
-                            maxLoyality.set(5, temp);
+                                    if ((totalRub > BudgetAllowanceDown && totalRub  < BudgetAllowance)  && (BenefitsForCompanyPerProcentBobr > 0 && BenefitsForCompanyPerProcentBobr < 10 && Math.abs(procent) < 0.05 )) {
 
+                                        double[] temp = maxLoyality.get(5);
+                                        double[] temp1 = maxLoyality.get(4);
+                                        double[] temp2 = maxLoyality.get(3);
+
+
+                                        if ((temp[7] <= trueness )) {
+                                            System.arraycopy(temp1, 0, temp2, 0, temp.length);
+                                            System.arraycopy(temp, 0, temp1, 0, temp.length);
+
+                                            for (int o = 0; o < index.length; o++) { // запоминаем индексы (кол-во товаров)
+                                                temp[o] = index[o];
+                                            }
+
+                                            temp[7] = trueness;
+                                            temp[8] = BenefitsForCompanyPerProcentBobr;
+                                            temp[9] = probability;
+                                            temp[10] = zatracheno;
+
+                                            maxLoyality.set(3, temp2);
+                                            maxLoyality.set(4, temp1);
+                                            maxLoyality.set(5, temp);
+
+                                        }
+
+                                    }//сэкономим
+
+                                    else if (totalRub > BudgetAllowanceDown && (totalRub  < costBudget) && BenefitsForCompanyPerProcentBobr >= 0 && BenefitsForCompanyPerProcentBobr <= 10 ) {
+                                        // System.out.println("b1 " + b1 + " b2 " + b2  + " b3 " + b3 + " b4 " + b4 + " " + procent);
+
+                                        double[] temp = maxLoyality.get(2);
+                                        double[] temp1 = maxLoyality.get(1);
+                                        double[] temp2 = maxLoyality.get(0);
+
+
+                                        if (temp[7] <= trueness ) {
+                                            System.arraycopy(temp1, 0, temp2, 0, temp.length);
+                                            System.arraycopy(temp, 0, temp1, 0, temp.length);
+
+
+                                            for (int o = 0; o < index.length; o++) { // запоминаем индексы (кол-во товаров)
+                                                temp[o] = index[o];
+                                            }
+
+                                            temp[7] = trueness;
+                                            temp[8] = BenefitsForCompanyPerProcentBobr;
+                                            temp[9] = probability;
+                                            temp[10] = zatracheno;
+
+
+                                            maxLoyality.set(0, temp2);
+                                            maxLoyality.set(1, temp1);
+                                            maxLoyality.set(2, temp);
+                                        }
+
+                                    }
+
+
+                                }
+                            }
                         }
-
-                    }//сэкономим
-
-                    else if ((totalRub  ) > BudgetAllowanceDown && (totalRub  < costBudget) && BenefitsForCompanyPerProcentBobr >= 0 && BenefitsForCompanyPerProcentBobr <= 10 ) {
-                        // System.out.println("b1 " + b1 + " b2 " + b2  + " b3 " + b3 + " b4 " + b4 + " " + procent);
-
-                        double[] temp = maxLoyality.get(2);
-                        double[] temp1 = maxLoyality.get(1);
-                        double[] temp2 = maxLoyality.get(0);
-
-
-                        if (temp[3] <= trueness ) {
-                            for (int l = 0; l < temp.length; l++)
-                                temp2[l] = temp1[l];
-                            for (int l = 0; l < temp.length; l++)
-                                temp1[l] = temp[l];
-
-
-                            temp[0] = i;
-                            temp[1] = j;
-                            temp[2] = k;
-                            temp[3] = trueness;
-                            temp[4] = BenefitsForCompanyPerProcentBobr;
-                            temp[5] = veroyatnost;
-                            temp[6] = zatracheno;
-
-
-                            maxLoyality.set(0, temp2);
-                            maxLoyality.set(1, temp1);
-                            maxLoyality.set(2, temp);
-                        }
-
                     }
+
                 }
 
             }
@@ -633,18 +662,22 @@ public class Main extends JFrame {
         int loyal = 0;
         for (int i = 0; i < maxLoyality.size(); i++) {
             int temployal = (int) maxLoyality.get(i)[3];
-            int sum = (int) (maxLoyality.get(i)[0] + maxLoyality.get(i)[1] + maxLoyality.get(i)[2]);
+            int sum = 0;
+
             if(temployal > loyal){
                 number = i;
                 loyal = temployal;
+                for (int j = 0; j < 7; j++) {
+                    sum += maxLoyality.get(i)[i];
+                }
                 maxSum = sum;
             }
         }
         out.println("Макс " + number +" " +  loyal);
         out.println("Лучшая подборка по лояльности: ");
-        for (int i = 0; i < maxLoyality.size(); i++) {
-            int sum = (int) (maxLoyality.get(i)[0] + maxLoyality.get(i)[1] + maxLoyality.get(i)[2]);
-            out.println("Такое значение подходит сумма = " + sum + " коэфф " + maxLoyality.get(i)[0] + " " + maxLoyality.get(i)[1] + " " + maxLoyality.get(i)[2] + " " + maxLoyality.get(i)[3] + " " + maxLoyality.get(i)[4] + " " + maxLoyality.get(i)[5]);
+        for (double[] doubles : maxLoyality) {
+            int sum = (int) (doubles[0] + doubles[1] + doubles[2]);
+            out.println("Такое значение подходит сумма = " + sum + " коэфф " + doubles[0] + " " + doubles[1] + " " + doubles[2] + " " + doubles[3] + " " + doubles[4] + " " + doubles[5]);
 
         }
         if ((int) (maxLoyality.get(number)[0] + maxLoyality.get(number)[1] + maxLoyality.get(number)[2]) == 0 & I < 100) {
@@ -667,29 +700,55 @@ public class Main extends JFrame {
             CountBoxInput.setText( "");
             stoimost1Lota.setText( "");*/
 
-            FindValue();
+           // FindValue();
         }
         //Вывод на экран
         if (maxLoyality.get(number)[0] != 0) {
-            //number = 5;
+
             priceBLot1.setText(priceLoots1 + "");
             priceBLot2.setText(priceLoots2 + "");
             priceBLot3.setText(priceLoots3 + "");
 
-            countLot1.setText((int) maxLoyality.get(number)[0] + "");
-            countLot2.setText((int) maxLoyality.get(number)[1] + "");
-            countLot3.setText((int) maxLoyality.get(number)[2] + "");
+            countLot1.setText(maxLoyality.get(number)[0] + "");
+            countLot2.setText( maxLoyality.get(number)[1] + "");
+            countLot3.setText(maxLoyality.get(number)[2] + "");
 
             likelihoodLot1.setText(new BigDecimal(maxLoyality.get(number)[0] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
             likelihoodLot2.setText(new BigDecimal(maxLoyality.get(number)[1] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
             likelihoodLot3.setText(new BigDecimal(maxLoyality.get(number)[2] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
             CountBoxInput.setText((int) maxSum + "");
             stoimost1Lota.setText(price1BlackBox + "");
-            loyaltyValue.setText(new BigDecimal(maxLoyality.get(number)[3]).setScale(2, RoundingMode.UP).doubleValue() + "");
-            benefitsValue.setText(new BigDecimal(maxLoyality.get(number)[4]).setScale(2, RoundingMode.UP).doubleValue() + "");
-            ActualCostInput.setText(maxLoyality.get(number)[6] + "");
+            loyaltyValue.setText(new BigDecimal(maxLoyality.get(number)[7]).setScale(2, RoundingMode.UP).doubleValue() + "");
+            benefitsValue.setText(new BigDecimal(maxLoyality.get(number)[8]).setScale(2, RoundingMode.UP).doubleValue() + "");
+            ActualCostInput.setText(maxLoyality.get(number)[10] + "");
             buyerValue.setText(price1BlackBox * maxSum + " Б. или " + price1BlackBox * maxSum * 2 + " руб.");
+
+            countDiscount10.setText(maxLoyality.get(number)[3] + "");
+            countDiscount20.setText(maxLoyality.get(number)[4] + "");
+            countDiscount30.setText(maxLoyality.get(number)[5] + "");
+            countDiscount40.setText(maxLoyality.get(number)[6] + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[3] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[4] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[5] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[6] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
         }
+    }
+
+    private double GetProbability(double i, int[] index) {
+        double sum = Arrays.stream(index).sum();
+        return i / sum;
+    }
+
+    private int ReceivedOnUsers(int[] indexs,int price){
+        int kol = Arrays.stream(indexs).sum();
+        return price * kol;
+    }
+    private int GetRealCost(int[] index, int[] prices){
+        int totalRealCost = 0;
+        for (int i = 0; i < index.length; i++) {
+             totalRealCost += index[i] * prices[i];
+        }
+        return totalRealCost;
     }
 
     public void FindMaxBenefValue() {
@@ -700,20 +759,16 @@ public class Main extends JFrame {
         double cost3 = Double.parseDouble(priceLot3.getText());
 
         double costBudget = Double.parseDouble(budgetInput.getText());
-
-
         double BudgetAllowance = costBudget + costBudget * ALLOWANCE;
 
-        ArrayList<double[]> maxLoyality = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            double[] temp = new double[7];
-            temp[3] = -1000000;// абсолютный минимум лояльности
-            temp[4] = -1000000;// минимум выгоды компании
-            temp[5] = 0; // минимум вероятности
-
-            maxLoyality.add(temp);
-        }
-        // System.out.println("stoimost1Lota.getText()" + stoimost1Lota.getText());
+        int discount10 = 500; // скидка в 10 % в рублях ср. знач
+        int discount20 = 1000; // скидка в 20 % в рублях ср. знач
+        int discount30 = 1500; // скидка в 30 % в рублях ср. знач
+        int discount40 = 2000; // скидка в 40 % в рублях ср. знач
+        int discount10Bobr =  discount10 / 2;
+        int discount20Bobr =  discount20 / 2;
+        int discount30Bobr =  discount30 / 2;
+        int discount40Bobr =  discount40 / 2;
 
         int cost1Bobr = (int) (cost1 / 2);
         int cost2Bobr = (int) (cost2 / 2);
@@ -785,67 +840,107 @@ public class Main extends JFrame {
         priceLoots2 = cost2Bobr;
         priceLoots3 = cost3Bobr;
 
+        int[] pricesRub = new int[7];
+        pricesRub[0] = (int) cost1;
+        pricesRub[1] = (int) cost2;
+        pricesRub[2] = (int) cost3;
+        pricesRub[3] =  discount10;
+        pricesRub[4] =  discount20;
+        pricesRub[5] =  discount30;
+        pricesRub[6] =  discount40;
 
+        int[] pricesBobr = new int[7];
+        pricesBobr[0] = (int) cost1Bobr;
+        pricesBobr[1] = (int) cost2Bobr;
+        pricesBobr[2] = (int) cost3Bobr;
+        pricesBobr[3] =  discount10Bobr;
+        pricesBobr[4] =  discount20Bobr;
+        pricesBobr[5] =  discount30Bobr;
+        pricesBobr[6] =  discount40Bobr;
+
+        ArrayList<double[]> maxLoyality = new ArrayList<>();
+
+        for (int i = 0; i < 6; i++) {
+            double[] temp = new double[11]; // индексы 0,1,2,3,4,5,6 это товары и скидки значение цены в руб/бобр
+            temp[7] = -1000000;// абсолютный минимум лояльности
+            temp[8] = -1000000;// минимум выгоды компании
+            temp[9] = 0; // минимум вероятности
+            maxLoyality.add(temp);
+        }
         for (int i = 1; i < I; i++) {
             for (int j = 1; j < J; j++) {
                 for (int k = 1; k < K; k++) {
-                    double totalRub = (double) (i * cost1 + j * cost2 + k * cost3);
-                    double totalBobr = (double) (i * cost1Bobr + j * cost2Bobr + k * cost3Bobr);
-                    zatracheno = (int) (cost1 * i + cost2 * j + cost3 * k);
-                    int receivedOnUsersBobr = pricePer1BoxBobr * (i + j + k) * 2;
-                    double BenefitsForCompanyBobr = receivedOnUsersBobr - totalRub;
-                    double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / receivedOnUsersBobr);
-                    //BenefitsForCompanyPerProcentBobr = new BigDecimal(BenefitsForCompanyPerProcentBobr).setScale(2, RoundingMode.UP).doubleValue();
-                    double veroyatnost = (double) i / (double) (i + j + k);
+                    for (int l = 0; l < 15; l++) {
+                        for (int m = 0; m < 12; m++) {
+                            for (int n = 0; n < 10; n++) {
+                                for (int p = 0; p < 7; p++) {
+                                    int[] index = new int[7];
+                                    index[0] = i; // Лот 1
+                                    index[1] = j; // Лот 2
+                                    index[2] = k; // Лот 3
+                                    index[3] = l; // Скидка 10
+                                    index[4] = m; // Скидка 20
+                                    index[5] = n; // Скидка 30
+                                    index[6] = p; // Скидка 40
 
-                    //System.out.println("totalBobr - costBudgetBobr) >= 0 " + totalBobr + " "+ costBudgetBobr);
-                    double[] ew = new double[7];
-                    ew[0] = cost1Bobr;
-                    ew[1] = cost2Bobr;
-                    ew[2] = cost3Bobr;
-                    ew[3] = pricePer1BoxBobr;
-                    ew[4] = i;
-                    ew[5] = j;
-                    ew[6] = k;
+                                    double totalRub= GetRealCost(index, pricesRub);
 
-                    double trueness = getTruetness(ew);
-                    int delta = (int) Math.abs(totalRub - Math.abs(costBudget));
-                    double procent = (delta / costBudget);
-                    //System.out.println(procent);
-                    boolean b1 = (totalBobr * 2) < BudgetAllowance;
-                    boolean b2 = ((totalBobr * 2) >= costBudget);
-                    boolean b3 = (BenefitsForCompanyPerProcentBobr > -2 && BenefitsForCompanyPerProcentBobr < 80);
-                    boolean b4 = (Math.abs(procent) < 0.05);
-                    //System.out.println("b1 " + b1 + " b2 " + b2  + " b3 " + b3 + " b4 " + b4 + " " + procent);
-                    if (((totalRub) < BudgetAllowance) && (BenefitsForCompanyPerProcentBobr > 0 && BenefitsForCompanyPerProcentBobr < WRITEOFFBOBER) && (Math.abs(procent) < 0.05)) {
-                        //System.out.println("Я здесь");
-                        //System.out.println("b1 " + b1 + " b2 " + b2  + " b3 " + b3 + " b4 " + b4 + " " + procent);
-                        double[] temp = maxLoyality.get(5);
-                        double[] temp1 = maxLoyality.get(4);
-                        double[] temp2 = maxLoyality.get(3);
+                                    zatracheno = GetRealCost(index, pricesRub);
+                                    int receivedOnUsersBobr = ReceivedOnUsers(index, pricePer1BoxBobr) * 2; // получили заработок магазина в бобрах
+                                    double BenefitsForCompanyBobr = receivedOnUsersBobr - totalRub;
+                                    double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / receivedOnUsersBobr);
 
+                                    double probability = GetProbability(i, index); // вероятность выпадения первого лота самого дорогого
 
-                        if ( temp[4] <= BenefitsForCompanyPerProcentBobr) {
-                            for (int l = 0; l < temp.length; l++)
-                                temp2[l] = temp1[l];
-                            for (int l = 0; l < temp.length; l++)
-                                temp1[l] = temp[l];
+                                    int[] costing = new int[8]; // массив цен в бобрах
+                                    costing[0] = cost1Bobr;
+                                    costing[1] = cost2Bobr;
+                                    costing[2] = cost3Bobr;
+                                    costing[3] = discount10Bobr;
+                                    costing[4] = discount20Bobr;
+                                    costing[5] = discount30Bobr;
+                                    costing[6] = discount40Bobr;
+                                    costing[7] = pricePer1BoxBobr;
 
-                            temp[0] = i;
-                            temp[1] = j;
-                            temp[2] = k;
-                            temp[3] = trueness;
-                            temp[4] = BenefitsForCompanyPerProcentBobr;
-                            temp[5] = veroyatnost;
-                            temp[6] = zatracheno;
+                                    double trueness = getTruetness(costing, index);
+                                    int delta = (int) Math.abs(totalRub - Math.abs(costBudget));
+                                    double procent = (delta / costBudget);
+                                    //System.out.println(procent);
+                                    if (((totalRub) < BudgetAllowance) && (BenefitsForCompanyPerProcentBobr > 0 && BenefitsForCompanyPerProcentBobr < WRITEOFFBOBER) && (Math.abs(procent) < 0.05)) {
 
-                            maxLoyality.set(3, temp2);
-                            maxLoyality.set(4, temp1);
-                            maxLoyality.set(5, temp);
+                                        double[] temp = maxLoyality.get(5);
+                                        double[] temp1 = maxLoyality.get(4);
+                                        double[] temp2 = maxLoyality.get(3);
 
+                                        if ( temp[8] <= BenefitsForCompanyPerProcentBobr) {
+                                            System.arraycopy(temp1, 0, temp2, 0, temp.length);
+                                            System.arraycopy(temp, 0, temp1, 0, temp.length);
+
+                                            for (int o = 0; o < index.length; o++) { // запоминаем индексы (кол-во товаров)
+                                                temp[o] = index[o];
+                                            }
+
+                                            temp[7] = trueness;
+                                            temp[8] = BenefitsForCompanyPerProcentBobr;
+                                            temp[9] = probability;
+                                            temp[10] = zatracheno;
+
+                                            maxLoyality.set(3, temp2);
+                                            maxLoyality.set(4, temp1);
+                                            maxLoyality.set(5, temp);
+
+                                        }
+                                    }
+                                }
+                            }
                         }
-
                     }
+
+
+
+
+
+
                 }
 
             }
@@ -855,10 +950,13 @@ public class Main extends JFrame {
         int loyal = 0;
         for (int i = 0; i < maxLoyality.size(); i++) {
             int temployal = (int) maxLoyality.get(i)[3];
-            int sum = (int) (maxLoyality.get(i)[0] + maxLoyality.get(i)[1] + maxLoyality.get(i)[2]);
+            int sum = 0;
             if(temployal > loyal){
                 number = i;
                 loyal = temployal;
+                for (int j = 0; j < 7; j++) {
+                    sum += maxLoyality.get(i)[i];
+                }
                 maxSum = sum;
             }
         }
@@ -911,6 +1009,14 @@ public class Main extends JFrame {
             loyaltyValue.setText(new BigDecimal(maxLoyality.get(number)[3] ).setScale(2, RoundingMode.UP).doubleValue() + "");
             benefitsValue.setText(new BigDecimal(maxLoyality.get(number)[4] ).setScale(2, RoundingMode.UP).doubleValue() + "");
             buyerValue.setText(price1BlackBox * maxSum + " Б. или " + price1BlackBox * maxSum * 2 + " руб.");
+            countDiscount10.setText(maxLoyality.get(number)[3] + "");
+            countDiscount20.setText(maxLoyality.get(number)[4] + "");
+            countDiscount30.setText(maxLoyality.get(number)[5] + "");
+            countDiscount40.setText(maxLoyality.get(number)[6] + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[3] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[4] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[5] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
+            likelihoodDiscount10.setText(new BigDecimal(maxLoyality.get(number)[6] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
         }
 
 
