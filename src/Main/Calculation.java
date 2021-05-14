@@ -1,5 +1,6 @@
 package Main;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -67,7 +68,6 @@ public class Calculation {
         pricesRub[6] = discount40;
 
 
-
         ArrayList<double[]> maxLoyality = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
@@ -90,8 +90,25 @@ public class Calculation {
         for (int i = 1; i < I; i++) {
             for (int j = 1; j < J; j++) {
                 for (int k = 1; k < K; k++) {
+                    for (int l = 0; l < listAboutSetkaForFirstLot.size(); l++) {
+                        JTextField[] mas = listAboutSetkaForFirstLot.get(l);
+                        if(i > Integer.parseInt(mas[0].getText() + "") && i < Integer.parseInt(mas[1].getText()+"")){
+                            pricesRub[0] = Integer.parseInt(mas[2].getText() + "");
 
-
+                        }
+                    }
+                    for (int l = 0; l < listAboutSetkaForSecondLot.size(); l++) {
+                        JTextField[] mas = listAboutSetkaForSecondLot.get(l);
+                        if(j > Integer.parseInt(mas[0].getText() + "") && j < Integer.parseInt(mas[1].getText()+"")){
+                            pricesRub[1] = Integer.parseInt(mas[2].getText() + "");
+                        }
+                    }
+                    for (int l = 0; l < listAboutSetkaForTherdLot.size(); l++) {
+                        JTextField[] mas = listAboutSetkaForTherdLot.get(l);
+                        if(k > Integer.parseInt(mas[0].getText() + "") && k < Integer.parseInt(mas[1].getText()+"")){
+                            pricesRub[2] = Integer.parseInt(mas[2].getText() + "");
+                        }
+                    }
                     int[] index = new int[3];
                     index[0] = i; // Лот 1
                     index[1] = j; // Лот 2
@@ -101,7 +118,7 @@ public class Calculation {
                     double totalRub = GetRealCost(index, pricesRub);
                     //double totalBobr= GetRealCost(index, pricesRub);
 
-                  int  zatracheno = GetRealCost(index, pricesRub);
+                    int zatracheno = GetRealCost(index, pricesRub);
 
                     double BenefitsForCompanyBobr = ReceivedOnUsers(index, pricePer1BoxBobr) * 2 - totalRub;
                     double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub);
@@ -291,7 +308,7 @@ public class Calculation {
                         double totalRub3 = GetRealCost(index, pricesRub);
                         //double totalBobr= GetRealCost(index, pricesRub);
 
-                      int  zatracheno = GetRealCost(index, pricesRub);
+                        int zatracheno = GetRealCost(index, pricesRub);
 
                         double BenefitsForCompanyBobr = ReceivedOnUsers(index, pricePer1BoxBobr) * 2 - totalRub3;
                         double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub3);
@@ -353,9 +370,9 @@ public class Calculation {
             for (int i = 0; i < 7; i++) {
                 maxSum += (int) maxLoyality.get(number)[i];
             }
-            priceBLot1.setText(priceBLot1 + "");
-            priceBLot2.setText(priceBLot2 + "");
-            priceBLot3.setText(priceBLot3+ "");
+            priceBLot1.setText(costing[0] + "");
+            priceBLot2.setText(costing[1] + "");
+            priceBLot3.setText(costing[3] + "");
 
             countLot1.setText(((int) maxLoyality.get(number)[0]) + "");
             countLot2.setText(((int) maxLoyality.get(number)[1]) + "");
@@ -457,7 +474,7 @@ public class Calculation {
                     double totalRub = GetRealCost(index, pricesRub);
                     //double totalBobr= GetRealCost(index, pricesRub);
 
-                  int  zatracheno = GetRealCost(index, pricesRub);
+                    int zatracheno = GetRealCost(index, pricesRub);
 
                     double BenefitsForCompanyBobr = ReceivedOnUsers(index, pricePer1BoxBobr) * 2 - totalRub;
                     double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub);
@@ -593,9 +610,9 @@ public class Calculation {
             //Вывод на экран
 
 
-            priceBLot1.setText(priceBLot1 + "");
-            priceBLot2.setText(priceBLot2 + "");
-            priceBLot3.setText(priceBLot3 + "");
+            priceBLot1.setText(costing[0] + "");
+            priceBLot2.setText(costing[1] + "");
+            priceBLot3.setText(costing[2] + "");
 
             countLot1.setText(new BigDecimal((int) maxLoyality.get(number)[0]).setScale(0, RoundingMode.UP).doubleValue() + "");
             countLot2.setText(new BigDecimal((int) maxLoyality.get(number)[1]).setScale(0, RoundingMode.UP).doubleValue() + "");
@@ -727,6 +744,7 @@ public class Calculation {
         }
 */
     }
+
     public static double getTruetness(int[] costs, int[] indexs) {
         double costLot = costs[7]; // стоимость лота
         double loyalty = 0;

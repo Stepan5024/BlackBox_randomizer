@@ -5,6 +5,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.font.TextAttribute;
+import java.util.ArrayList;
+import java.util.Map;
 
 
 import static java.lang.System.out;
@@ -47,6 +52,12 @@ public class CalcFrame extends JFrame {
     public static JTextField ActualCostInput = new JTextField(textActualCost);
     public static JLabel buyerValue = new JLabel("");
 
+
+    public static ArrayList<JTextField[]> listAboutSetkaForFirstLot = new ArrayList<>();
+    public static ArrayList<JTextField[]> listAboutSetkaForSecondLot = new ArrayList<>();
+    public static ArrayList<JTextField[]> listAboutSetkaForTherdLot = new ArrayList<>();
+
+
     public CalcFrame() {
 
         setTitle("Калькулятор БлэкБокс");
@@ -57,8 +68,9 @@ public class CalcFrame extends JFrame {
         } catch (Exception ex) {
         }
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         int weight = 530;
         int height = 500;
@@ -81,6 +93,380 @@ public class CalcFrame extends JFrame {
         JLabel lot1 = new JLabel("Лот 1");
         JLabel lot2 = new JLabel("Лот 2");
         JLabel lot3 = new JLabel("Лот 3");
+        Font original;
+        original = lot1.getFont();
+        Map attributes = original.getAttributes();
+        attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        lot1.setFont(original.deriveFont(attributes));
+        lot2.setFont(original.deriveFont(attributes));
+        lot3.setFont(original.deriveFont(attributes));
+
+        lot1.setToolTipText("Нажми, чтобы добавить ценовую сетку");
+        lot2.setToolTipText("Нажми, чтобы добавить ценовую сетку");
+        lot3.setToolTipText("Нажми, чтобы добавить ценовую сетку");
+
+
+        lot1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JFrame frame = new JFrame("Ценновая сетка лота 1");
+                // создаем  панель.
+                JPanel p = new JPanel();
+                frame.add(p);
+
+                // к панели добавляем менеджер FlowLayout.
+                p.setLayout(new FlowLayout());
+
+
+                JButton button = new JButton("Добавить цену в категорию");
+                JButton buttonOk = new JButton("Сетка готова");
+
+
+                buttonOk.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        out.println("Сохраняем данные");
+                        frame.setVisible(false);
+                        for (int i = 0; i < listAboutSetkaForFirstLot.size(); i++) {
+                            JTextField[] mas = listAboutSetkaForFirstLot.get(i);
+                            for (int j = 0; j < 3; j++) {
+                                out.println(mas[j].getText());
+                            }
+                            // обязательно в будущем добавить проверку на корректность
+
+                        }
+                    }
+                });
+                button.setSize(10, 10);
+                p.add(button);
+                p.add(buttonOk);
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        out.println("Click buutoon");
+                        JPanel panelTemp = new JPanel();
+                        GridLayout layout = new GridLayout(2, 3, 5, 12);
+
+                        panelTemp.setLayout(layout);
+
+                        JLabel labelKolVo = new JLabel("Кол-во");
+                        JLabel labeltemp = new JLabel("");
+
+                        JLabel labelprice = new JLabel("Цена");
+
+                        JTextField[] mas = new JTextField[3];
+                        mas[0] = new JTextField("От");
+                        mas[1] = new JTextField("До");
+                        mas[2] = new JTextField("руб.");
+                        listAboutSetkaForFirstLot.add(mas);
+
+                        panelTemp.add(labelKolVo);
+                        panelTemp.add(labeltemp);
+                        panelTemp.add(labelprice);
+                        panelTemp.add(mas[0]);
+                        panelTemp.add(mas[1]);
+                        panelTemp.add(mas[2]);
+                        panelTemp.setBackground(new Color(215, 142, 135));
+                        p.add(panelTemp);
+                        p.updateUI();
+
+                        Thread t = new Thread(() -> {
+
+                            while (true) {
+                                if (mas[0].hasFocus() && mas[0].getText().compareTo("От") == 0) {
+
+                                    mas[0].setText("");
+                                    mas[0].setForeground(Color.black);
+
+                                } else if (mas[1].hasFocus() && mas[1].getText().compareTo("До") == 0) {
+
+                                    mas[1].setText("");
+                                    mas[1].setForeground(Color.black);
+
+                                } else if (mas[2].hasFocus() && mas[2].getText().compareTo("руб.") == 0) {
+
+                                    mas[2].setText("");
+                                    mas[2].setForeground(Color.black);
+
+                                } else if (!mas[0].hasFocus() && mas[0].getText().compareTo("") == 0) {
+
+                                    mas[0].setText("От");
+                                    mas[0].setForeground(Color.RED);
+
+                                } else if (!mas[1].hasFocus() && mas[1].getText().compareTo("") == 0) {
+
+                                    mas[1].setText("До");
+                                    mas[1].setForeground(Color.RED);
+
+                                } else if (!mas[2].hasFocus() && mas[2].getText().compareTo("") == 0) {
+
+                                    mas[2].setText("руб.");
+                                    mas[2].setForeground(Color.RED);
+
+                                }
+
+                            }
+                        });
+                        t.start();
+
+
+                    }
+                });
+
+                frame.setVisible(true);
+
+                Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+                int weight = 430;
+                int height = 350;
+                int x = (int) ((dimension.getWidth() - weight) / 2);
+                int y = (int) ((dimension.getHeight() - height) / 2);
+                frame.setBounds(x, y, weight, height);
+                System.out.println("clicked!");
+            }
+
+        });
+        lot2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JFrame frame = new JFrame("Ценновая сетка лота 2");
+                // создаем  панель.
+                JPanel p = new JPanel();
+                frame.add(p);
+
+                // к панели добавляем менеджер FlowLayout.
+                p.setLayout(new FlowLayout());
+
+
+                JButton button = new JButton("Добавить цену в категорию");
+                JButton buttonOk = new JButton("Сетка готова");
+
+
+                buttonOk.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        out.println("Сохраняем данные");
+                        frame.setVisible(false);
+                        for (int i = 0; i < listAboutSetkaForSecondLot.size(); i++) {
+                            JTextField[] mas = listAboutSetkaForSecondLot.get(i);
+                            for (int j = 0; j < 3; j++) {
+                                out.println(mas[j].getText());
+                            }
+                            // обязательно в будущем добавить проверку на корректность
+
+                        }
+                    }
+                });
+                button.setSize(10, 10);
+                p.add(button);
+                p.add(buttonOk);
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        out.println("Click buutoon");
+                        JPanel panelTemp = new JPanel();
+                        GridLayout layout = new GridLayout(2, 3, 5, 12);
+
+                        panelTemp.setLayout(layout);
+
+                        JLabel labelKolVo = new JLabel("Кол-во");
+                        JLabel labeltemp = new JLabel("");
+
+                        JLabel labelprice = new JLabel("Цена");
+
+                        JTextField[] mas = new JTextField[3];
+                        mas[0] = new JTextField("От");
+                        mas[1] = new JTextField("До");
+                        mas[2] = new JTextField("руб.");
+                        listAboutSetkaForSecondLot.add(mas);
+
+                        panelTemp.add(labelKolVo);
+                        panelTemp.add(labeltemp);
+                        panelTemp.add(labelprice);
+                        panelTemp.add(mas[0]);
+                        panelTemp.add(mas[1]);
+                        panelTemp.add(mas[2]);
+                        panelTemp.setBackground(new Color(215, 142, 135));
+                        p.add(panelTemp);
+                        p.updateUI();
+
+                        Thread t = new Thread(() -> {
+
+                            while (true) {
+                                if (mas[0].hasFocus() && mas[0].getText().compareTo("От") == 0) {
+
+                                    mas[0].setText("");
+                                    mas[0].setForeground(Color.black);
+
+                                } else if (mas[1].hasFocus() && mas[1].getText().compareTo("До") == 0) {
+
+                                    mas[1].setText("");
+                                    mas[1].setForeground(Color.black);
+
+                                } else if (mas[2].hasFocus() && mas[2].getText().compareTo("руб.") == 0) {
+
+                                    mas[2].setText("");
+                                    mas[2].setForeground(Color.black);
+
+                                } else if (!mas[0].hasFocus() && mas[0].getText().compareTo("") == 0) {
+
+                                    mas[0].setText("От");
+                                    mas[0].setForeground(Color.RED);
+
+                                } else if (!mas[1].hasFocus() && mas[1].getText().compareTo("") == 0) {
+
+                                    mas[1].setText("До");
+                                    mas[1].setForeground(Color.RED);
+
+                                } else if (!mas[2].hasFocus() && mas[2].getText().compareTo("") == 0) {
+
+                                    mas[2].setText("руб.");
+                                    mas[2].setForeground(Color.RED);
+
+                                }
+
+                            }
+                        });
+                        t.start();
+
+
+                    }
+                });
+
+                frame.setVisible(true);
+
+                Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+                int weight = 430;
+                int height = 350;
+                int x = (int) ((dimension.getWidth() - weight) / 2);
+                int y = (int) ((dimension.getHeight() - height) / 2);
+                frame.setBounds(x, y, weight, height);
+                System.out.println("clicked!");
+            }
+
+        });
+        lot3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JFrame frame = new JFrame("Ценновая сетка лота 1");
+                // создаем  панель.
+                JPanel p = new JPanel();
+                frame.add(p);
+
+                // к панели добавляем менеджер FlowLayout.
+                p.setLayout(new FlowLayout());
+
+
+                JButton button = new JButton("Добавить цену в категорию");
+                JButton buttonOk = new JButton("Сетка готова");
+
+
+                buttonOk.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        out.println("Сохраняем данные");
+                        frame.setVisible(false);
+                        for (int i = 0; i < listAboutSetkaForTherdLot.size(); i++) {
+                            JTextField[] mas = listAboutSetkaForTherdLot.get(i);
+                            for (int j = 0; j < 3; j++) {
+                                out.println(mas[j].getText());
+                            }
+                            // обязательно в будущем добавить проверку на корректность
+
+                        }
+                    }
+                });
+                button.setSize(10, 10);
+                p.add(button);
+                p.add(buttonOk);
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        out.println("Click buutoon");
+                        JPanel panelTemp = new JPanel();
+                        GridLayout layout = new GridLayout(2, 3, 5, 12);
+
+                        panelTemp.setLayout(layout);
+
+                        JLabel labelKolVo = new JLabel("Кол-во");
+                        JLabel labeltemp = new JLabel("");
+
+                        JLabel labelprice = new JLabel("Цена");
+
+                        JTextField[] mas = new JTextField[3];
+                        mas[0] = new JTextField("От");
+                        mas[1] = new JTextField("До");
+                        mas[2] = new JTextField("руб.");
+                        listAboutSetkaForTherdLot.add(mas);
+
+                        panelTemp.add(labelKolVo);
+                        panelTemp.add(labeltemp);
+                        panelTemp.add(labelprice);
+                        panelTemp.add(mas[0]);
+                        panelTemp.add(mas[1]);
+                        panelTemp.add(mas[2]);
+                        panelTemp.setBackground(new Color(215, 142, 135));
+                        p.add(panelTemp);
+                        p.updateUI();
+
+                        Thread t = new Thread(() -> {
+
+                            while (true) {
+                                if (mas[0].hasFocus() && mas[0].getText().compareTo("От") == 0) {
+
+                                    mas[0].setText("");
+                                    mas[0].setForeground(Color.black);
+
+                                } else if (mas[1].hasFocus() && mas[1].getText().compareTo("До") == 0) {
+
+                                    mas[1].setText("");
+                                    mas[1].setForeground(Color.black);
+
+                                } else if (mas[2].hasFocus() && mas[2].getText().compareTo("руб.") == 0) {
+
+                                    mas[2].setText("");
+                                    mas[2].setForeground(Color.black);
+
+                                } else if (!mas[0].hasFocus() && mas[0].getText().compareTo("") == 0) {
+
+                                    mas[0].setText("От");
+                                    mas[0].setForeground(Color.RED);
+
+                                } else if (!mas[1].hasFocus() && mas[1].getText().compareTo("") == 0) {
+
+                                    mas[1].setText("До");
+                                    mas[1].setForeground(Color.RED);
+
+                                } else if (!mas[2].hasFocus() && mas[2].getText().compareTo("") == 0) {
+
+                                    mas[2].setText("руб.");
+                                    mas[2].setForeground(Color.RED);
+
+                                }
+
+                            }
+                        });
+                        t.start();
+
+
+                    }
+                });
+
+                frame.setVisible(true);
+             //   frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+                int weight = 430;
+                int height = 350;
+                int x = (int) ((dimension.getWidth() - weight) / 2);
+                int y = (int) ((dimension.getHeight() - height) / 2);
+                frame.setBounds(x, y, weight, height);
+                System.out.println("clicked!");
+            }
+
+        });
+
         JLabel discount10 = new JLabel("Скидка 10%");
         JLabel discount20 = new JLabel("Скидка 20%");
         JLabel discount30 = new JLabel("Скидка 30%");

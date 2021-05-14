@@ -15,11 +15,6 @@ import static java.lang.System.out;
 public class Main {
 
 
-
-
-
-
-
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel((LookAndFeel) Class.forName(UIManager.getCrossPlatformLookAndFeelClassName()).newInstance());
