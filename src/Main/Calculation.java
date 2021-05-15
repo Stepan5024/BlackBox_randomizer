@@ -34,7 +34,7 @@ public class Calculation {
         int costBudget = input.getCostBudget()[0]; // ввод бюджета в руб.
         int costBudgetBobr = input.getCostBudget()[1]; // ввод бюджета в Б.
 
-        int pricePer1BoxBobr = cost1Bobr / 2;
+        int pricePer1BoxBobr = input.getPricePer1Box();
 
         int discount10 = input.getValueOfDiscount()[0]; // скидка в 10 % в рублях ср. знач
         int discount20 = input.getValueOfDiscount()[1]; // скидка в 20 % в рублях ср. знач
@@ -46,8 +46,8 @@ public class Calculation {
         int discount30Bobr = input.getValueOfDiscount()[6];
         int discount40Bobr = input.getValueOfDiscount()[7];
 
-        double BudgetAllowance = costBudget - costBudget * 0.2 + costBudget * ALLOWANCE; // превысить бюджет на 5% с четом залога 20% на скидки
-        double BudgetAllowanceDown = costBudget - costBudget * 0.2 - costBudget * ALLOWANCE; // закупиться меньше бюджета на 5% с четом залога 20% на скидки
+        double BudgetAllowance = costBudget - costBudget * 0.3 + costBudget * ALLOWANCE; // превысить бюджет на 5% с четом залога 30% на скидки
+        double BudgetAllowanceDown = costBudget - costBudget * 0.3 - costBudget * ALLOWANCE; // закупиться меньше бюджета на 5% с четом залога 30% на скидки
         out.println("BudgetAllowance = " + BudgetAllowance);
         out.println("BudgetAllowanceDown  = " + BudgetAllowanceDown);
 
@@ -71,12 +71,13 @@ public class Calculation {
         ArrayList<double[]> maxLoyality = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            double[] temp = new double[10]; // индексы 0,1,2,3,4,5,6 это товары и скидки значение цены в руб/бобр
+            double[] temp = new double[11]; // индексы 0,1,2,3,4,5,6 это товары и скидки значение цены в руб/бобр
             temp[7] = -1000000;// абсолютный минимум лояльности
             temp[8] = -1000000;// минимум выгоды компании
 
             maxLoyality.add(temp);
         }
+
         int[] costing = new int[8]; // массив цен в бобрах
         costing[0] = cost1Bobr;
         costing[1] = cost2Bobr;
@@ -87,74 +88,84 @@ public class Calculation {
         costing[6] = discount40Bobr;
         costing[7] = pricePer1BoxBobr;
 
-        for (int i = 1; i < I; i++) {
-            for (int j = 1; j < J; j++) {
-                for (int k = 1; k < K; k++) {
-                    for (int l = 0; l < listAboutSetkaForFirstLot.size(); l++) {
-                        JTextField[] mas = listAboutSetkaForFirstLot.get(l);
-                        if(i > Integer.parseInt(mas[0].getText() + "") && i < Integer.parseInt(mas[1].getText()+"")){
-                            pricesRub[0] = Integer.parseInt(mas[2].getText() + "");
+        if(cost1Bobr + cost2Bobr + cost3Bobr > 3800){
+            for (int i = 3; i < 7; i++) {
+                costing[i] += 500;
+            }
+        }
+        for (int i = 0; i < I; i++) {
+            for (int j = 0; j < J; j++) {
+                for (int k = 0; k < K; k++) {
+                    for (int l = (int) (pricePer1BoxBobr - pricePer1BoxBobr * 0.8); l < pricePer1BoxBobr * 2; l = l + 100) {
 
+                        costing[7] = l;
+                        if (costing[7] > costing[1]) {
+                            continue;
                         }
-                    }
-                    for (int l = 0; l < listAboutSetkaForSecondLot.size(); l++) {
-                        JTextField[] mas = listAboutSetkaForSecondLot.get(l);
-                        if(j > Integer.parseInt(mas[0].getText() + "") && j < Integer.parseInt(mas[1].getText()+"")){
-                            pricesRub[1] = Integer.parseInt(mas[2].getText() + "");
+                        for (JTextField[] mas : listAboutSetkaForFirstLot) {
+                            if (i >= Integer.parseInt(mas[0].getText() + "") && i <= Integer.parseInt(mas[1].getText() + "")) {
+                                pricesRub[0] = Integer.parseInt(mas[2].getText() + "");
+
+                            }
                         }
-                    }
-                    for (int l = 0; l < listAboutSetkaForTherdLot.size(); l++) {
-                        JTextField[] mas = listAboutSetkaForTherdLot.get(l);
-                        if(k > Integer.parseInt(mas[0].getText() + "") && k < Integer.parseInt(mas[1].getText()+"")){
-                            pricesRub[2] = Integer.parseInt(mas[2].getText() + "");
+                        for (JTextField[] mas : listAboutSetkaForSecondLot) {
+                            if (j >= Integer.parseInt(mas[0].getText() + "") && j <= Integer.parseInt(mas[1].getText() + "")) {
+                                pricesRub[1] = Integer.parseInt(mas[2].getText() + "");
+                            }
                         }
-                    }
-                    int[] index = new int[3];
-                    index[0] = i; // Лот 1
-                    index[1] = j; // Лот 2
-                    index[2] = k; // Лот 3
+                        for (JTextField[] mas : listAboutSetkaForTherdLot) {
+                            if (k >= Integer.parseInt(mas[0].getText() + "") && k <= Integer.parseInt(mas[1].getText() + "")) {
+                                pricesRub[2] = Integer.parseInt(mas[2].getText() + "");
+                            }
+                        }
+                        int[] index = new int[3];
+                        index[0] = i; // Лот 1
+                        index[1] = j; // Лот 2
+                        index[2] = k; // Лот 3
 
 
-                    double totalRub = GetRealCost(index, pricesRub);
-                    //double totalBobr= GetRealCost(index, pricesRub);
+                        double totalRub = GetRealCost(index, pricesRub);
+                        //double totalBobr= GetRealCost(index, pricesRub);
 
-                    int zatracheno = GetRealCost(index, pricesRub);
+                        int zatracheno = GetRealCost(index, pricesRub);
 
-                    double BenefitsForCompanyBobr = ReceivedOnUsers(index, pricePer1BoxBobr) * 2 - totalRub;
-                    double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub);
-
-
-                    double trueness = getTruetness(costing, index);
+                        double BenefitsForCompanyBobr = ReceivedOnUsers(index, costing[7]) * 2 - totalRub;
+                        double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub);
 
 
-                    if ((totalRub > BudgetAllowanceDown && totalRub < BudgetAllowance) && (BenefitsForCompanyPerProcentBobr > 0)) {
-
-                        double[] temp = maxLoyality.get(5);
-                        double[] temp1 = maxLoyality.get(4);
-                        double[] temp2 = maxLoyality.get(3);
+                        double trueness = getTruetness(costing, index);
 
 
-                        if ((temp[7] <= trueness)) {
-                            System.arraycopy(temp1, 0, temp2, 0, temp.length);
-                            System.arraycopy(temp, 0, temp1, 0, temp.length);
+                        if ((totalRub > BudgetAllowanceDown && totalRub < BudgetAllowance) && (BenefitsForCompanyPerProcentBobr > 0)) {
 
-                            for (int o = 0; o < index.length; o++) { // запоминаем индексы (кол-во товаров)
-                                temp[o] = index[o];
+                            double[] temp = maxLoyality.get(5);
+                            double[] temp1 = maxLoyality.get(4);
+                            double[] temp2 = maxLoyality.get(3);
+
+
+                            if ((temp[7] <= trueness) || trueness < 0.8) {
+                                System.arraycopy(temp1, 0, temp2, 0, temp.length);
+                                System.arraycopy(temp, 0, temp1, 0, temp.length);
+
+                                for (int o = 0; o < index.length; o++) { // запоминаем индексы (кол-во товаров)
+                                    temp[o] = index[o];
+                                }
+
+                                temp[7] = trueness;
+                                temp[8] = BenefitsForCompanyPerProcentBobr;
+                                temp[9] = zatracheno;
+                                temp[10] = costing[7];
+
+                                maxLoyality.set(3, temp2);
+                                maxLoyality.set(4, temp1);
+                                maxLoyality.set(5, temp);
+
                             }
 
-                            temp[7] = trueness;
-                            temp[8] = BenefitsForCompanyPerProcentBobr;
-
-                            temp[9] = zatracheno;
-
-                            maxLoyality.set(3, temp2);
-                            maxLoyality.set(4, temp1);
-                            maxLoyality.set(5, temp);
 
                         }
-
-
                     }
+
                 }
 
             }
@@ -181,7 +192,9 @@ public class Calculation {
             out.println("Такое значение подходит сумма = " + sum + " коэфф " + doubles[0] + " " + doubles[1] + " " + doubles[2] + " " + doubles[3] + " " + doubles[4] + " " + doubles[5]);
 
         }
-
+        out.println("Цена бокса до " + costing[7]);
+        costing[7] = (int) maxLoyality.get(number)[10];
+        out.println("Цена бокса после " + costing[7]);
         if ((int) (maxLoyality.get(number)[0] + maxLoyality.get(number)[1] + maxLoyality.get(number)[2]) == 0 & I < 100) {
             I += 20;
             J += 20;
@@ -194,7 +207,8 @@ public class Calculation {
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 for (int k = 0; k < 15; k++) {
-                    for (int l = 0; l < 10; l++) {
+                    for (int l = 0; l < 15; l++) {
+
 
                         int[] index2 = new int[7];
                         index2[0] = (int) maxLoyality.get(number)[0]; // Лот 1
@@ -208,10 +222,11 @@ public class Calculation {
 
                         double totalRub = GetRealCost(index2, pricesRub);
 
-                        double BenefitsForCompanyBobr = ReceivedOnUsers(index2, pricePer1BoxBobr) * 2 - totalRub;
+                        double BenefitsForCompanyBobr = ReceivedOnUsers(index2, costing[7]) * 2 - totalRub;
                         double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub);
 
-                        double trueness = getTruetness2(costing, index2);
+                        double trueness = getTruetness(costing, index2);
+                        // double trueness = getTruetness2(costing, index2);
 
                         if ((totalRub > costBudget * 0.95 && totalRub < costBudget * 1.05) && (BenefitsForCompanyPerProcentBobr > 0)) {
                             // out.println("Я здесь");
@@ -230,8 +245,8 @@ public class Calculation {
 
                                 temp[7] = trueness;
                                 temp[8] = BenefitsForCompanyPerProcentBobr;
-
                                 temp[9] = totalRub;
+                                temp[10] = costing[7];
 
                                 maxLoyality.set(3, temp2);
                                 maxLoyality.set(4, temp1);
@@ -279,7 +294,11 @@ public class Calculation {
             likelihoodLot2.setText(new BigDecimal(maxLoyality.get(number)[1] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
             likelihoodLot3.setText(new BigDecimal(maxLoyality.get(number)[2] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
             CountBoxInput.setText(maxSum + "");
-            stoimost1Lota.setText(pricePer1BoxBobr + " Б.");
+            if (pricePer1BoxBobr == maxLoyality.get(number)[10]) {
+                stoimost1Lota.setText(pricePer1BoxBobr + " Б.");
+            } else {
+                stoimost1Lota.setText(pricePer1BoxBobr + " Б." + "рекомендуемая стоимость лота в Б. " + maxLoyality.get(number)[10]);
+            }
             loyaltyValue.setText(new BigDecimal(maxLoyality.get(number)[7]).setScale(2, RoundingMode.UP).doubleValue() + "");
             benefitsValue.setText(new BigDecimal(maxLoyality.get(number)[8]).setScale(2, RoundingMode.UP).doubleValue() + "");
             ActualCostInput.setText(maxLoyality.get(number)[9] + "");
@@ -295,55 +314,81 @@ public class Calculation {
             likelihoodDiscount40.setText(new BigDecimal(maxLoyality.get(number)[6] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
 
 
-        } else {
+        }
+        else {
             for (int i = 0; i < I; i++) {
                 for (int j = 0; j < J; j++) {
                     for (int k = 0; k < K; k++) {
-                        int[] index = new int[3];
-                        index[0] = i; // Лот 1
-                        index[1] = j; // Лот 2
-                        index[2] = k; // Лот 3
+                        for (int l = (int) (pricePer1BoxBobr - pricePer1BoxBobr * 0.8); l < pricePer1BoxBobr * 3; l = l + 100) {
+
+                            costing[7] = l;
+
+                            for (JTextField[] mas : listAboutSetkaForFirstLot) {
+                                if (i >= Integer.parseInt(mas[0].getText() + "") && i <= Integer.parseInt(mas[1].getText() + "")) {
+                                    pricesRub[0] = Integer.parseInt(mas[2].getText() + "");
+
+                                }
+                            }
+                            for (JTextField[] mas : listAboutSetkaForSecondLot) {
+                                if (j >= Integer.parseInt(mas[0].getText() + "") && j <= Integer.parseInt(mas[1].getText() + "")) {
+                                    pricesRub[1] = Integer.parseInt(mas[2].getText() + "");
+                                }
+                            }
+                            for (JTextField[] mas : listAboutSetkaForTherdLot) {
+                                if (k >= Integer.parseInt(mas[0].getText() + "") && k <= Integer.parseInt(mas[1].getText() + "")) {
+                                    pricesRub[2] = Integer.parseInt(mas[2].getText() + "");
+                                }
+                            }
+
+                            int[] index = new int[3];
+                            index[0] = i; // Лот 1
+                            index[1] = j; // Лот 2
+                            index[2] = k; // Лот 3
 
 
-                        double totalRub3 = GetRealCost(index, pricesRub);
-                        //double totalBobr= GetRealCost(index, pricesRub);
+                            double totalRub3 = GetRealCost(index, pricesRub);
+                            //double totalBobr= GetRealCost(index, pricesRub);
 
-                        int zatracheno = GetRealCost(index, pricesRub);
+                            int zatracheno = GetRealCost(index, pricesRub);
 
-                        double BenefitsForCompanyBobr = ReceivedOnUsers(index, pricePer1BoxBobr) * 2 - totalRub3;
-                        double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub3);
-
-
-                        double trueness = getTruetness(costing, index);
+                            double BenefitsForCompanyBobr = ReceivedOnUsers(index, costing[7]) * 2 - totalRub3;
+                            double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub3);
 
 
-                        if (totalRub < costBudget * 1.05 && (BenefitsForCompanyPerProcentBobr > 0)) {
+                            double trueness = getTruetness(costing, index);
 
-                            double[] temp = maxLoyality.get(5);
-                            double[] temp1 = maxLoyality.get(4);
-                            double[] temp2 = maxLoyality.get(3);
-                            out.println("Зашел суда " + temp[7]);
 
-                            if ((temp[7] <= trueness)) {
-                                System.arraycopy(temp1, 0, temp2, 0, temp.length);
-                                System.arraycopy(temp, 0, temp1, 0, temp.length);
+                            if (totalRub < costBudget * 1.05 && (BenefitsForCompanyPerProcentBobr > 0) && totalRub > costBudget * 0.9) {
 
-                                for (int o = 0; o < index.length; o++) { // запоминаем индексы (кол-во товаров)
-                                    temp[o] = index[o];
+                                double[] temp = maxLoyality.get(5);
+                                double[] temp1 = maxLoyality.get(4);
+                                double[] temp2 = maxLoyality.get(3);
+                                //  out.println("Зашел суда " + temp[7]);
+
+                                if ((temp[7]*0.94 <= trueness) ) {
+                                    System.arraycopy(temp1, 0, temp2, 0, temp.length);
+                                    System.arraycopy(temp, 0, temp1, 0, temp.length);
+
+                                    for (int o = 0; o < index.length; o++) { // запоминаем индексы (кол-во товаров)
+                                        temp[o] = index[o];
+                                    }
+
+                                    temp[7] = trueness;
+                                    temp[8] = BenefitsForCompanyPerProcentBobr;
+                                    temp[9] = zatracheno;
+                                    temp[10] = costing[7];
+
+                                    maxLoyality.set(3, temp2);
+                                    maxLoyality.set(4, temp1);
+                                    maxLoyality.set(5, temp);
+
                                 }
 
-                                temp[7] = trueness;
-                                temp[8] = BenefitsForCompanyPerProcentBobr;
-                                temp[9] = zatracheno;
-
-                                maxLoyality.set(3, temp2);
-                                maxLoyality.set(4, temp1);
-                                maxLoyality.set(5, temp);
 
                             }
 
-
                         }
+
                     }
                 }
             }
@@ -382,7 +427,11 @@ public class Calculation {
             likelihoodLot2.setText(new BigDecimal(maxLoyality.get(number)[1] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
             likelihoodLot3.setText(new BigDecimal(maxLoyality.get(number)[2] / maxSum).setScale(2, RoundingMode.UP).doubleValue() + "");
             CountBoxInput.setText(maxSum + "");
-            stoimost1Lota.setText(pricePer1BoxBobr + "");
+            if (pricePer1BoxBobr == maxLoyality.get(number)[10]) {
+                stoimost1Lota.setText(pricePer1BoxBobr + " Б.");
+            } else {
+                stoimost1Lota.setText(pricePer1BoxBobr + " Б." + "рекомендуемая стоимость лота в Б. " + maxLoyality.get(number)[10]);
+            }
             loyaltyValue.setText(new BigDecimal(maxLoyality.get(number)[7]).setScale(2, RoundingMode.UP).doubleValue() + "");
             benefitsValue.setText(new BigDecimal(maxLoyality.get(number)[8]).setScale(2, RoundingMode.UP).doubleValue() + "");
             ActualCostInput.setText(maxLoyality.get(number)[9] + "");
@@ -464,6 +513,25 @@ public class Calculation {
             for (int j = 1; j < J; j++) {
                 for (int k = 1; k < K; k++) {
 
+                    for (int l = 0; l < listAboutSetkaForFirstLot.size(); l++) {
+                        JTextField[] mas = listAboutSetkaForFirstLot.get(l);
+                        if (i >= Integer.parseInt(mas[0].getText() + "") && i <= Integer.parseInt(mas[1].getText() + "")) {
+                            pricesRub[0] = Integer.parseInt(mas[2].getText() + "");
+
+                        }
+                    }
+                    for (int l = 0; l < listAboutSetkaForSecondLot.size(); l++) {
+                        JTextField[] mas = listAboutSetkaForSecondLot.get(l);
+                        if (j >= Integer.parseInt(mas[0].getText() + "") && j <= Integer.parseInt(mas[1].getText() + "")) {
+                            pricesRub[1] = Integer.parseInt(mas[2].getText() + "");
+                        }
+                    }
+                    for (int l = 0; l < listAboutSetkaForTherdLot.size(); l++) {
+                        JTextField[] mas = listAboutSetkaForTherdLot.get(l);
+                        if (k >= Integer.parseInt(mas[0].getText() + "") && k <= Integer.parseInt(mas[1].getText() + "")) {
+                            pricesRub[2] = Integer.parseInt(mas[2].getText() + "");
+                        }
+                    }
 
                     int[] index = new int[7];
                     index[0] = i; // Лот 1
@@ -557,7 +625,8 @@ public class Calculation {
                         double BenefitsForCompanyBobr = ReceivedOnUsers(index2, pricePer1BoxBobr) * 2 - totalRub;
                         double BenefitsForCompanyPerProcentBobr = 100 * (BenefitsForCompanyBobr / totalRub);
 
-                        double trueness = getTruetness2(costing, index2);
+                        //double trueness = getTruetness2(costing, index2);
+                        double trueness = getTruetness(costing, index2);
 
                         if ((totalRub > costBudget * 0.95 && totalRub < costBudget * 1.05) && (BenefitsForCompanyPerProcentBobr > 0) && BenefitsForCompanyPerProcentBobr < WRITEOFFBOBER) {
                             // out.println("Я здесь");
@@ -748,80 +817,33 @@ public class Calculation {
     public static double getTruetness(int[] costs, int[] indexs) {
         double costLot = costs[7]; // стоимость лота
         double loyalty = 0;
-
-        double k1 = (costs[0] - costLot) / costLot;
-        double k2 = (costs[1] - costLot) / costLot;
-        double k3 = (costs[2] - costLot) / costLot;
-        // double k4 = (costs[3] - costLot) / costLot;
-
-        double kol_1 = k1 * indexs[0];
-        double kol_2 = k2 * indexs[1];
-        double kol_3 = k3 * indexs[2];
-        // double kol_4 = k4 * indexs[3];
-
-        int vsego = Arrays.stream(indexs).sum();
-
-        loyalty = (vsego + kol_2 + kol_3) / (vsego);
-        /*double[] coefficients = new double[4]; // массив коэффицентов разности валюты выигрыша к стоимости BlackBox
-        for (int i = 0; i < coefficients.length; i++) {
-            coefficients[i] = (costs[i] - costLot) / costLot;
-        }
-
-        int[] unhappy = new int[4]; // массив кол-ва недовльных в среднем выигрышем
+        int sumPeopleHappy = Arrays.stream(indexs).sum();
+        int sumAllPeople = sumPeopleHappy;
+        int[] unhappy = new int[indexs.length];
         for (int i = 0; i < unhappy.length; i++) {
-            unhappy[i] = (int) coefficients[i] * indexs[i];
+            unhappy[i] = RoundUP(indexs[i] * (costs[i] - costLot) / costLot);
+
+            if (unhappy[i] > 0) {
+                unhappy[i] = RoundUP(unhappy[i] / 2.0);
+            }
+            if(costs[i] == costLot){
+                unhappy[i] = RoundUP(unhappy[i]*0.25);
+            }
+            unhappy[i] = Math.abs(unhappy[i]);
+
+            // System.out.println(unhappy[i] + "несчастных");
+            sumPeopleHappy -= unhappy[i];
+            // System.out.println(sumPeopleHappy + " сумма счастливых");
         }
 
-        double joyful = Arrays.stream(indexs).sum(); // посчитаем сумму довольных,
-        joyful += Arrays.stream(unhappy).asDoubleStream().sum();// вычитая из общей массы участников массива недовольных
-        double loyalty = joyful / Arrays.stream(indexs).sum(); // отношение довольных к общей массе участников
-*/
-        return loyalty * 100;
+        loyalty = (double) sumPeopleHappy / sumAllPeople;
 
+        return loyalty;
     }
 
+    public static int RoundUP(double number) {
 
-    public static double getTruetness2(int[] costs, int[] indexs) {
-        double costLot = costs[7]; // стоимость лота
-        double loyalty = 0;
-
-        double k1 = (costs[0] - costLot) / costLot;
-        double k2 = (costs[1] - costLot) / costLot;
-        double k3 = (costs[2] - costLot) / costLot;
-        double k4 = (costs[3] - costLot) / costLot;
-        double k5 = (costs[4] - costLot) / costLot;
-        double k6 = (costs[5] - costLot) / costLot;
-        double k7 = (costs[6] - costLot) / costLot;
-
-
-        double kol_1 = k1 * indexs[0];
-        double kol_2 = k2 * indexs[1];
-        double kol_3 = k3 * indexs[2];
-        double kol_4 = k4 * indexs[3];
-        double kol_5 = k5 * indexs[4];
-        double kol_6 = k6 * indexs[5];
-        double kol_7 = k7 * indexs[6];
-
-
-        int vsego = Arrays.stream(indexs).sum();
-
-        loyalty = (vsego + kol_2 + kol_3 + kol_4 + kol_5 + kol_6 + kol_7) / (vsego);
-        /*double[] coefficients = new double[4]; // массив коэффицентов разности валюты выигрыша к стоимости BlackBox
-        for (int i = 0; i < coefficients.length; i++) {
-            coefficients[i] = (costs[i] - costLot) / costLot;
-        }
-
-        int[] unhappy = new int[4]; // массив кол-ва недовльных в среднем выигрышем
-        for (int i = 0; i < unhappy.length; i++) {
-            unhappy[i] = (int) coefficients[i] * indexs[i];
-        }
-
-        double joyful = Arrays.stream(indexs).sum(); // посчитаем сумму довольных,
-        joyful += Arrays.stream(unhappy).asDoubleStream().sum();// вычитая из общей массы участников массива недовольных
-        double loyalty = joyful / Arrays.stream(indexs).sum(); // отношение довольных к общей массе участников
-*/
-        return loyalty * 100;
-
+        return new BigDecimal(number).setScale(0, RoundingMode.UP).intValue();
     }
 
 

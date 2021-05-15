@@ -483,6 +483,7 @@ public class CalcFrame extends JFrame {
         JButton solution = new JButton("Рассчитать");
         JButton clear = new JButton("Очистить");
         JLabel stoimost1Bobr = new JLabel("По цене в Б.");
+        JLabel stoimostBobr = new JLabel("Б.");
         JLabel loyalty = new JLabel("Лояльность");
         JLabel benefits = new JLabel("Выгода для компании в списании Б.");
         priceLot1.setForeground(Color.RED); // цвет текста обязательного поля стоймости товара в рублях
@@ -508,70 +509,76 @@ public class CalcFrame extends JFrame {
         Thread t = new Thread(() -> {
 
             while (true) {
-                if (priceLot1.hasFocus() && priceLot1.getText().compareTo(pricefor1count) == 0) {
+                try {
 
-                    priceLot1.setText("");
-                    priceLot1.setForeground(Color.black);
 
-                } else if (priceLot2.hasFocus() && priceLot2.getText().compareTo(pricefor1count) == 0) {
+                    if (priceLot1.hasFocus() && priceLot1.getText().compareTo(pricefor1count) == 0) {
 
-                    priceLot2.setText("");
-                    priceLot2.setForeground(Color.black);
+                        priceLot1.setText("");
+                        priceLot1.setForeground(Color.black);
 
-                } else if (priceLot3.hasFocus() && priceLot3.getText().compareTo(pricefor1count) == 0) {
+                    } else if (priceLot2.hasFocus() && priceLot2.getText().compareTo(pricefor1count) == 0) {
 
-                    priceLot3.setText("");
-                    priceLot3.setForeground(Color.black);
+                        priceLot2.setText("");
+                        priceLot2.setForeground(Color.black);
 
-                } else if (budgetInput.hasFocus() && budgetInput.getText().compareTo(textbudget) == 0) {
+                    } else if (priceLot3.hasFocus() && priceLot3.getText().compareTo(pricefor1count) == 0) {
 
-                    budgetInput.setText("");
-                    budgetInput.setForeground(Color.black);
+                        priceLot3.setText("");
+                        priceLot3.setForeground(Color.black);
 
-                } else if (stoimost1Lota.hasFocus() && stoimost1Lota.getText().compareTo(priceBfor1count3) == 0) {
-                    stoimost1Lota.setText("");
-                } else if (priceBLot1.hasFocus() && priceBLot1.getText().compareTo(priceBfor1count) == 0) {
-                    priceBLot1.setText("");
-                } else if (priceBLot2.hasFocus() && priceBLot2.getText().compareTo(priceBfor1count) == 0) {
-                    priceBLot2.setText("");
-                } else if (priceBLot3.hasFocus() && priceBLot3.getText().compareTo(priceBfor1count) == 0) {
-                    priceBLot3.setText("");
-                } else if (!priceLot1.hasFocus() && priceLot1.getText().compareTo("") == 0) {
+                    } else if (budgetInput.hasFocus() && budgetInput.getText().compareTo(textbudget) == 0) {
 
-                    priceLot1.setText(pricefor1count);
-                    priceLot1.setForeground(Color.RED);
+                        budgetInput.setText("");
+                        budgetInput.setForeground(Color.black);
 
-                } else if (!priceLot2.hasFocus() && priceLot2.getText().compareTo("") == 0) {
+                    } else if (stoimost1Lota.hasFocus() && stoimost1Lota.getText().compareTo(priceBfor1count3) == 0) {
+                        stoimost1Lota.setText("");
+                    } else if (priceBLot1.hasFocus() && priceBLot1.getText().compareTo(priceBfor1count) == 0) {
+                        priceBLot1.setText("");
+                    } else if (priceBLot2.hasFocus() && priceBLot2.getText().compareTo(priceBfor1count) == 0) {
+                        priceBLot2.setText("");
+                    } else if (priceBLot3.hasFocus() && priceBLot3.getText().compareTo(priceBfor1count) == 0) {
+                        priceBLot3.setText("");
+                    } else if (!priceLot1.hasFocus() && priceLot1.getText().compareTo("") == 0) {
 
-                    priceLot2.setText(pricefor1count);
-                    priceLot2.setForeground(Color.RED);
+                        priceLot1.setText(pricefor1count);
+                        priceLot1.setForeground(Color.RED);
 
-                } else if (!priceLot3.hasFocus() && priceLot3.getText().compareTo("") == 0) {
+                    } else if (!priceLot2.hasFocus() && priceLot2.getText().compareTo("") == 0) {
 
-                    priceLot3.setText(pricefor1count);
-                    priceLot3.setForeground(Color.RED);
+                        priceLot2.setText(pricefor1count);
+                        priceLot2.setForeground(Color.RED);
 
-                } else if (!budgetInput.hasFocus() && budgetInput.getText().compareTo("") == 0) {
+                    } else if (!priceLot3.hasFocus() && priceLot3.getText().compareTo("") == 0) {
 
-                    budgetInput.setText(textbudget);
-                    budgetInput.setForeground(Color.RED);
+                        priceLot3.setText(pricefor1count);
+                        priceLot3.setForeground(Color.RED);
 
-                } else if (!priceBLot1.hasFocus() && priceBLot1.getText().compareTo("") == 0) {
+                    } else if (!budgetInput.hasFocus() && budgetInput.getText().compareTo("") == 0) {
 
-                    priceBLot1.setText(priceBfor1count);
+                        budgetInput.setText(textbudget);
+                        budgetInput.setForeground(Color.RED);
 
-                } else if (!priceBLot2.hasFocus() && priceBLot2.getText().compareTo("") == 0) {
+                    } else if (!priceBLot1.hasFocus() && priceBLot1.getText().compareTo("") == 0) {
 
-                    priceBLot2.setText(priceBfor1count);
+                        priceBLot1.setText(priceBfor1count);
 
-                } else if (!priceBLot3.hasFocus() && priceBLot3.getText().compareTo("") == 0) {
+                    } else if (!priceBLot2.hasFocus() && priceBLot2.getText().compareTo("") == 0) {
 
-                    priceBLot3.setText(priceBfor1count);
+                        priceBLot2.setText(priceBfor1count);
 
-                } else if (!(countLot1.getText().compareTo("Вероятность") == 0)) {
-                    progressBar.setIndeterminate(false);
+                    } else if (!priceBLot3.hasFocus() && priceBLot3.getText().compareTo("") == 0) {
+
+                        priceBLot3.setText(priceBfor1count);
+
+                    } else if ((likelihoodDiscount10.getText().compareTo("Вероятность") != 0)) {
+                        progressBar.setIndeterminate(false);
+                    }
                 }
+                catch (NullPointerException e){
 
+                }
             }
         });
         t.start();
@@ -604,11 +611,11 @@ public class CalcFrame extends JFrame {
 
 
         panel.setLayout(null);
-        lot1.setBounds(30, 10, 100, 20);
+        lot1.setBounds(30, 10, 50, 20);
         panel.add(lot1);
-        lot2.setBounds(30, 40, 100, 20);
+        lot2.setBounds(30, 40, 50, 20);
         panel.add(lot2);
-        lot3.setBounds(30, 70, 100, 20);
+        lot3.setBounds(30, 70, 50, 20);
         panel.add(lot3);
         priceLot1.setBounds(80, 10, 100, 20);
         panel.add(priceLot1);
@@ -703,6 +710,9 @@ public class CalcFrame extends JFrame {
 
         stoimost1Bobr.setBounds(340, 210, 230, 20);
         panel.add(stoimost1Bobr);
+        stoimostBobr.setBounds(457, 210, 30, 20);
+        panel.add(stoimostBobr);
+
         stoimost1Lota.setBounds(400, 210, 50, 20);
         panel.add(stoimost1Lota);
 
@@ -715,6 +725,7 @@ public class CalcFrame extends JFrame {
         panel.add(progressBar);
 
         add(panel);
+
         setTitle("Калькулятор рамдомайзера BlackBox©");
         solution.addActionListener(e -> {
             if ((priceLot1.getText().compareTo(priceBfor1count) == 0 || priceLot2.getText().compareTo(priceBfor1count) == 0 || priceLot3.getText().compareTo(priceBfor1count) == 0 || budgetInput.getText().compareTo(textbudget) == 0)) {
@@ -821,7 +832,7 @@ public class CalcFrame extends JFrame {
                     lotPrices[4] = cost2Bobr;
                     lotPrices[5] = cost3Bobr;
 
-                    InputData inputData = new InputData(lotPrices, valueOfDiscont, Budget);
+                    InputData inputData = new InputData(lotPrices, valueOfDiscont, Budget, pricePer1BoxBobr);
 
 
                     if (cbBobrs.isSelected() && cbLoyalnost.isSelected()) {
