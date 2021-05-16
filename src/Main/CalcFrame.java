@@ -43,7 +43,8 @@ public class CalcFrame extends JFrame {
     public static JTextField CountBoxInput = new JTextField(textCountBox);
 
     public static String priceBfor1count3 = "Б.";
-    public static JTextField stoimost1Lota = new JTextField(priceBfor1count3);
+    public static JTextField stoimost1Lota = new JTextField("Б.");
+    public static JCheckBox fixscheck = new JCheckBox("фикс. цену");
 
     public static JLabel loyaltyValue = new JLabel("");
     public static JLabel benefitsValue = new JLabel("");
@@ -349,7 +350,7 @@ public class CalcFrame extends JFrame {
         lot3.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JFrame frame = new JFrame("Ценновая сетка лота 1");
+                JFrame frame = new JFrame("Ценновая сетка лота 3");
                 // создаем  панель.
                 JPanel p = new JPanel();
                 frame.add(p);
@@ -697,7 +698,7 @@ public class CalcFrame extends JFrame {
 
         buyer.setBounds(30, 260, 190, 20);
         panel.add(buyer);
-        buyerValue.setBounds(220, 260, 190, 20);
+        buyerValue.setBounds(220, 260, 390, 20);
         panel.add(buyerValue);
 
         settings.setBounds(90, 300, 180, 30);
@@ -713,8 +714,10 @@ public class CalcFrame extends JFrame {
         stoimostBobr.setBounds(457, 210, 30, 20);
         panel.add(stoimostBobr);
 
-        stoimost1Lota.setBounds(400, 210, 50, 20);
+        stoimost1Lota.setBounds(400, 210, 100, 20);
         panel.add(stoimost1Lota);
+        fixscheck.setBounds(400, 225, 100, 20);
+        panel.add(fixscheck);
 
         solution.setBounds(140, 360, 200, 30);
         panel.add(solution);

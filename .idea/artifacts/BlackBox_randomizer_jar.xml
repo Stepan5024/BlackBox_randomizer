@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="BlackBox_randomizer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/BlackBox_randomizer_jar</output-path>
+    <root id="archive" name="BlackBox_randomizer.jar">
+      <element id="module-output" name="BlackBox_randomizer" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/opentest4j-1.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/junit-jupiter-api-5.8.0-M1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/apiguardian-api-1.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/junit-4.13.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/junit-platform-commons-1.8.0-M1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
