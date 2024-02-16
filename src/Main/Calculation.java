@@ -648,6 +648,7 @@ public class Calculation {
                         index[1] = j; // Лот 2
                         index[2] = k; // Лот 3
 
+                        int e = 3_000_999_9;
 
                         double totalRub = GetRealCost(index, pricesRub);
                         //double totalBobr= GetRealCost(index, pricesRub);
@@ -864,13 +865,15 @@ public class Calculation {
     }
 
     public static double getTruetness(int[] costs, int[] indexs) {
-        double costLot = costs[7]; // стоимость лота
+        // массив indexs хранит значения покупки лота 1, лота 2, ... лота7 . То есть если например 4 купили лот1, 8 лот2, 0 чел купили лот 3 и тд
+        // массив costs хранить значения цены ПРОДАЖИ семи лотов
+        double costLot = costs[7]; // последний элемент хранит стоимость лота
         double loyalty = 0;
-        int sumPeopleHappy = Arrays.stream(indexs).sum();
+        int sumPeopleHappy = Arrays.stream(indexs).sum(); // Сумма всех покупателей, то есть всех лотов которые куплены. То есть кол-во блэкбоксов
         int sumAllPeople = sumPeopleHappy;
-        int[] unhappy = new int[indexs.length];
+        int[] unhappy = new int[indexs.length]; // массив недовольных длиной index.length
         for (int i = 0; i < unhappy.length; i++) {
-            unhappy[i] = RoundUP(indexs[i] * (costs[i] - costLot) / costLot);
+            unhappy[i] = RoundUP(indexs[i] * (costs[i] - costLot) / costLot); // RoundUP округл вверх
 
             if (unhappy[i] > 0) {
                 unhappy[i] = RoundUP(unhappy[i] / 2.0);

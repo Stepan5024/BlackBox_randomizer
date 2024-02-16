@@ -7,8 +7,9 @@ import java.util.Arrays;
 public class Testing {
 
     public static void main(String[] args) {
-
-        int[] index2 = new int[7];
+        int e = 3_000_999_9;
+        System.out.println(e);
+        /*int[] index2 = new int[7];
         index2[0] = 0; // Лот 1
         index2[1] = 11; // Лот 2
         index2[2] = 1; // Лот 3
@@ -28,7 +29,7 @@ public class Testing {
         costing[7] = 1500;
         //System.out.println(RoundUP(-0.2));
         System.out.println("лояльность " + getTruetness(costing, index2));
-
+*/
     }
 
     public static double getTruetness(int[] costs, int[] indexs) {
